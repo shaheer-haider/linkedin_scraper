@@ -6,7 +6,6 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import NoSuchElementException
 from .objects import Experience, Education, Scraper, Interest, Accomplishment, Contact
 import os
-from linkedin_scraper import selectors
 
 
 class Person(Scraper):
@@ -115,6 +114,9 @@ class Person(Scraper):
         self.scroll_to_bottom()
         main_list = self.wait_for_element_to_load(name="pvs-list", base=main)
         for position in main_list.find_elements(By.XPATH,"li"):
+            work_times = None
+            times = None
+            duration = None
             position = position.find_element(By.CLASS_NAME,"pvs-entity")
             company_logo_elem, position_details = position.find_elements(By.XPATH,"*")
 
@@ -177,6 +179,7 @@ class Person(Scraper):
                         institution_name=company,
                         linkedin_url=company_linkedin_url
                     )
+
                     self.add_experience(experience)
             else:
                 description = position_summary_text.text if position_summary_text else ""
@@ -303,7 +306,7 @@ class Person(Scraper):
             interestContainer = driver.find_element(By.XPATH,
                 "//*[@class='pv-profile-section pv-interests-section artdeco-container-card artdeco-card ember-view']"
             )
-            for interestElement in interestContainer.find_elements(By.XPATH, 
+            for interestElement in interestContainer.find_elements(By.XPATH,
                 "//*[@class='pv-interest-entity pv-profile-section__card-item ember-view']"
             ):
                 interest = Interest(
@@ -326,11 +329,11 @@ class Person(Scraper):
             acc = driver.find_element(By.XPATH,
                 "//*[@class='pv-profile-section pv-accomplishments-section artdeco-container-card artdeco-card ember-view']"
             )
-            for block in acc.find_elements(By.XPATH, 
+            for block in acc.find_elements(By.XPATH,
                 "//div[@class='pv-accomplishments-block__content break-words']"
             ):
                 category = block.find_element(By.TAG_NAME, "h3")
-                for title in block.find_element(By.TAG_NAME, 
+                for title in block.find_element(By.TAG_NAME,
                     "ul"
                 ).find_elements(By.TAG_NAME, "li"):
                     accomplishment = Accomplishment(category.text, title.text)
